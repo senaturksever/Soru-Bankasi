@@ -1,0 +1,95 @@
+Model yapısı:
+- Sorular
+    - Test
+    - Klasik
+    - Doğru Yanlış
+- Sınavlar
+    - Test (Sadece test sorular)
+    - Klasik (Sadece klasik sorular)
+    - Karışık (Test, Klasik ve Doğru/Yanlış soruları)
+
+Servis:
+- Dosya Servisi
+
+Yardımcı:
+- Filtreleme fonksiyonları
+
+Command Line Interface (Komut satırı arayüzü):
+- Sorular CLI
+    - Filtreleme CLI
+- Sınavlar CLI
+
+******************************************
+************* MODEL DETAY ****************
+******************************************
+
+Model genel yapıların bulunduğu yerdir. Yukarıda belirtildiği gibi sorular ve sınavlar bu uygulama için genel yapılardır.
+İlk olarak soru bizim temel modelimiz diyebiliriz.
+Soruyu tasarlarken önce genellemek için abstract (soyut) bir sınıf oluşturuyoruz. Abstract bir anahtar sözcüktür ve nesneye
+yönelik programlamada önemi büyüktür. Soyut olan soru sınıfı oluşturulup tüm soru tiplerinin ortak barındırması gereken özellikler
+burada tanımlanır. Sorunun genel özellikleri sorunun soru bölümü, seviyesi, puanı ve doğru cevabı. İstenilen comparable
+interface sınıfıda dahil edilmiştir. Bu interface dahil edildikten sonra sınıfa compareTo metodunun yazılması gereklidir.
+Bu metod yazıldıktan sonra artık soru tipindeki nesneler sıralanabilir halde olmaktadır. Aynı zamanda serializable diye bir
+interface dahil edilmiştir bunun sebebi dosyaya yazma işlemi yaparken gerekli olmasıdır.
+Bu ana sınıf özellikleri private şekilde tanımlanmıştır. Nesne programlamada encapsulation (kapsülleme) yapılmıştır.
+Kapsüllemeden dolayı get ve set metodlarıda değişkenler için yazılmıştır. Level için bir string tipinde değişken tutulup Kolay,
+Orta ve Zor gibi şeyler yazmaktansa. Enum tipinde yeni bir Level değişkeni tanımlanmıştır. Bu level değişkeni sayesinde
+sorunun levelı belli olmaktadır.
+Classic(Klasik), MultipleChoice(Test) ve TrueFalse(Doğru/Yanlış) üç tane sınıf oluşturulmuştur. Nesneye yönelik programlamanın
+kalıtım özelliğini kullanarak normal soru sınıfından türetilerek yaratılmıştır. Bu soru tipleri genel soru sınıfından
+oluşturulduğu için bunların hepsini içinde barındırır. Ana soru sınıfında abstract olarak yazılmış getQuestionType metodu
+diğer sınıflarda yazılmak durumunda kalınmıştır. Çünkü ana sınıfta abstract olarak tanımlandığı zaman kalıtım yapılan diğer
+sınfılarda metodun gövdesini yazmak zorunludur. Bu getQuestionType metodunun soru sınıfından türetilen 3 sınıf için ayrı
+ayrı doldurulmasıda nesneye yönelik programlamanın polymorphism özelliğinin sağlandığını gösteririri. Aynı zamanda toString
+metoduda bu özelliği karşılar. Klasik ve Doğru Yanlış sınıf tiplerinde yeni bir özellik eklemeye gerek duyulmamıştır.
+Fakat test sorusunda genel soru sınıfında bulunmayan bir özellik eklenmesi gerekmiştir. Bu özellikte şıklardır. Şıklar
+multipleChoice sınıfına ek olarak eklenmiştir.
+
+----------------------------------------------------
+
+Exam sınıfı abstarct (soyut) bir sınıftır. Aynı soru sınıfının tanımlanması gibi değişkenleri tanımlanmıştır.
+Soru sınıfındaki Level kavramı gibi burada da ExamType kavramı vardır. Farklı olarak burada gözlemlenen şeyler
+List<Question> yani sınavda bulunan sorular listesi ve List<Object> answers yani sınavda bulunan cevaplar listesidir.
+Ardından değişkenler encapsulation yöntemi ile tanımlandığı için get ve set metodları yazılmıştır. System.out.println da
+kolayca gözlemleyebilmek için toString metodu yazılmıştır. Abstract bir createExam metodu yazılmıştır. Soru sınıfında
+bahsettiğimiz gibi bu ana sınıfta gövdesi yazılmayan bir metotdur. Fakat bu sınıftan kalıtım alarak türetilen yeni sınıflarda
+bunun yazılması gereklidir. Ve polymorphism özelliği bu sayede sağlanır.
+Ardından bu sınıftan ClassicExam, MixedExam ve TestExam sınıfları türetilir. Bu sınıfların ana Sınav sınıfından bir farkı
+genel anlamda yoktur. Sadece constructor (Yapıcı) metodunda yani kendi ismiyle çağrılan metodunda ek olarak setExamType() diye
+bir fonksiyon çağrısı vardır. Bu sınav tipini belirtmek için yapılan birşeydir.
+Bu farklı sınav tiplerinde yani Klasik, Test ve Mix önemli kısmı olan createExam yani sınav yarat kısmı her sınıf için ayrı
+yazılmıştır.
+
+createExam metodunun içinde net olarak yapılmak istenen 100 puandan yüksek bir puana sahip olan sayısı önemli olmayan soruları
+rastgele sınava atayabilecek bir algoritma yazılmıştır. Hepsi için bu metodun ayrı olmasının sebebi Klasik sınavda sadece
+klasik sorular alınmıştır. Test sınavında sadece test sorular alınmıştır. Mixte ise tüm soruların karışımı alınmıştır.
+
+******************************************
+************* SERVİS DETAY ****************
+******************************************
+
+Burada servis göz korkutmamalı. Dosya işlemlerini yapılabilmek için kodlar yazılmak istenmiştir.
+FileService diye bir interface kullanılmıştır. Bunun amacı kullanıcının içeriği görmesini istememizden kaynaklıdır. Bu
+pek düşünülmesi gereken birşey değildir. Tasarımsal bir seçimdir. FileServiceImpl sınıfında bu interfacede boş bırakılan
+metotların işlevleri yazılmıştır. Burada dosyadan obje tipinde okuma işlemi, obje tipinde yazma işlemi ve dosya yaratma gibi
+3 tane özellik sağlayabilen metotlar vardır. Tüm sınıf tipinde listeleri dosyaya yazmak için soru tipinde listeleri dosyaya
+yazmak için bu metotlar kullanılabiliyor ortak olarak. Tamamiyle basit dosyaya nesne yazma işlemleridir. Herhangi bir detayı
+yoktur.
+
+******************************************
+************* YARDIMCI DETAY ****************
+******************************************
+
+Yardımcı paketinde sadece Filter diye bir sınıf bulunmaktadır. Bu sınıfın görevi sorular listesini alıp bu listede çeşitli
+arama işlemleri yapmayı sağlamaktır. Kod kirliliğini ortadan kaldırıp güzel bir tasarımla kullanılması açısından burada
+geliştirilmesi seçilmiştir. İstenilen tüm filtreleme işlemleri fonksiyonlar şeklinde yazılmış ve kullanıma hazır bırakılmıştır.
+
+******************************************
+************* CLI DETAY ****************
+******************************************
+
+Burası tüm yazıların falan yazıldığı yerdir. Kullanıcıyla iletişime geçilen yer burasıdır.
+Burada önemli ve algılaması zor olabilecek şey statik değişkenler ve sınıfların singleton tasarım deseni ile tasarlanmış olmasıdır.
+Singleton tasarım deseni ile tasarlanma sebebi bu sınıftan bir ve sadece bir nesne oluşturulabilmesi istendiği içindir.
+Statik listeler kullanılmasının sebebi de listeler tekrar tekrar yaratılmasından ziyade bir sefer yaratılıp her yerde
+aynı listeyi kullanmak içindir.

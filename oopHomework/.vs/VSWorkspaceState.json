@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\files",
+    "\\src",
+    "\\src\\CLI",
+    "\\src\\model",
+    "\\src\\model\\exam",
+    "\\src\\model\\question",
+    "\\src\\service",
+    "\\src\\test",
+    "\\src\\util"
+  ],
+  "SelectedNode": "\\src\\CLI\\Main.java",
+  "PreviewInSolutionExplorer": false
+}
